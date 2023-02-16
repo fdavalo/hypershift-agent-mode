@@ -1,0 +1,1 @@
+# hypershit-agent-mode
