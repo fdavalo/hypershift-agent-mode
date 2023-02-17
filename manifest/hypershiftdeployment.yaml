@@ -1,0 +1,65 @@
+apiVersion: cluster.open-cluster-management.io/v1alpha1
+kind: HypershiftDeployment
+metadata:
+  name: hycl1
+  namespace: clusters
+spec:
+  hostingCluster: local-cluster
+  hostingNamespace: hycl1
+  hostedClusterSpec:
+    networking:
+      machineCIDR: 10.6.82.0/24
+      networkType: OVNKubernetes
+      podCIDR: 10.132.0.0/14
+      serviceCIDR: 172.31.0.0/16
+    platform:
+      type: Agent
+      agent:
+        agentNamespace: baremetal
+    pullSecret:
+      name: cluster-hycl1-pullsecret
+    release:
+      image: quay.io/openshift-release-dev/ocp-release:4.11.26-x86_64
+    dns:
+      baseDomain: redhat.hpecic.net
+    controllerAvailabilityPolicy: SingleReplica
+    infrastructureAvailabilityPolicy: SingleReplica
+    services:
+    - service: APIServer
+      servicePublishingStrategy:
+        nodePort:
+          address: 10.6.82.55
+        type: NodePort
+    - service: OAuthServer
+      servicePublishingStrategy:
+        type: Route
+    - service: Konnectivity
+      servicePublishingStrategy:
+        type: Route
+    - service: Ignition
+      servicePublishingStrategy:
+        type: Route
+    sshKey:
+      name: cluster-hycl1-sshkey
+  nodePools:
+  - name: hycl1-pool-1
+    spec:
+      clusterName: hycl1
+      management:
+        autoRepair: false
+        replace:
+          rollingUpdate:
+            maxSurge: 1
+            maxUnavailable: 0
+          strategy: RollingUpdate
+        upgradeType: Replace
+      platform:
+        agent:
+          agentLabelSelector: {}
+          agentNamespace: baremetal
+        type: Agent
+      release:
+        image: quay.io/openshift-release-dev/ocp-release:4.11.26-x86_64
+      replicas: 2
+  infrastructure:
+    configure: False
