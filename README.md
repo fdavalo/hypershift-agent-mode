@@ -1,5 +1,3 @@
-# hypershit-agent-mode
-
 # Create an Hypershift cluster with Agent mode for Workers
 
 ## Provision nodes on an Infrastructure Env (use Discovery ISO or PXE Boot mode)
@@ -52,11 +50,11 @@
 
 * API server publishing strategy : 
 
-        ** not for testing, use a LoadBalancer (cloud provider, metalLB, front VIP)
+  ** not for testing, use a LoadBalancer (cloud provider, metalLB, front VIP)
         
-        ** not for testing, use nodeport and provide the IP of a front VIP that will loadbalance on cluster nodes and the chosen nodeport
+  ** not for testing, use nodeport and provide the IP of a front VIP that will loadbalance on cluster nodes and the chosen nodeport
 
-        ** for testing, use nodeport and just provide the ip of a node from the hub cluster and let the installer choose an available nodeport
+  ** for testing, use nodeport and just provide the ip of a node from the hub cluster and let the installer choose an available nodeport
         
 * Machine CIDR : choose the subnet where worker nodes main IP should be used 
 
@@ -66,26 +64,38 @@
 
 [![Review Page](https://github.com/fdavalo/hypershift-agent-mode/blob/main/hypershift-create-ui-review.png?raw=true)](hypershift-create-ui-review.png)
 
-
-
-## Create a Virtual Machine on Vsphere to be used as template for nodes
-
-   The virtual machine will not be started, only created to be cloned as template
+   First step, creation of control plane pods on the Hub cluster
    
-[![Create a virtual machine on vsphere](https://github.com/fdavalo/mce-agent-provision-vms/blob/main/vsphere-vm-template.png?raw=true)](vsphere-vm-template.png)
+   Nodes are bound to the cluster and installation is just starting
 
-## Clone the Virtual Machine as a template
+[![Start Page](https://github.com/fdavalo/hypershift-agent-mode/blob/main/hypershift-create-starting-nodes.png?raw=true)](hypershift-create-starting-nodes.png)
+
+   Control plane pods are almost all ready
    
-[![Clone the virtual machine as a template on vsphere](https://github.com/fdavalo/mce-agent-provision-vms/blob/main/vsphere-template.png?raw=true)](vsphere-template.png)
+   Worker nodes are installing and updating
 
-## Use the Tekton Pipeline to create the Virtual Machine
+[![Installed Page](https://github.com/fdavalo/hypershift-agent-mode/blob/main/hypershift-create-installed.png?raw=true)](hypershift-create-installed.png)
+
+   The last control plane pods appear lately (ovnkube master when worker nodes are ready) : around 10 minutes duration
    
-   The Pipeline is started and asking for a Workspace (persistent volume to share files between tasks), choose a volume claim template
+   The control plane can be changed to "HiglyAvailable" instead of "SingleReplica" in the HostedCluster CRD or during the creation in the CRD edit tab
+   
+[![Control Plane Pods](https://github.com/fdavalo/hypershift-agent-mode/blob/main/hypershift-control-plane-pods.png?raw=true)](hypershift-control-plane-pods.png)
 
-   The Tekton pipeline consists of 3 steps :
+   The cluster is ready
+   
+[![Final Page](https://github.com/fdavalo/hypershift-agent-mode/blob/main/hypershift-create-final.png?raw=true)](hypershift-create-final.png)
 
-* Clone this git repository (fetch terraform template and bash scripts)
+   Add the hypershift cluster wildcard DNS to be able to access the cluster console
+   
+   You can add the wildcard for each worker node IP
+   
+             *.apps.hycl3 IN A 10.6.82.226
+             *.apps.hycl3 IN A 10.6.82.232
 
-* Use terraform to create the Virtual Machine (random name is used, a cdrom is used to boot the discovery iso)
+   Or you can create a front loadbalancer with the widlcard DNS pointing to it and that loadbalance to the worker nodes
 
-* A bash script will fetch Virtual Machine name and IP to update the Agent (approved=true, hostname=vm name)
+   Now, you can see in the hypershift console that only worker nodes appear, there is no more control plane nodes
+   
+[![Worker nodes](https://github.com/fdavalo/hypershift-agent-mode/blob/main/hypershift-cluster-nodes.png?raw=true)](hypershift-cluster-nodes.png)
+
