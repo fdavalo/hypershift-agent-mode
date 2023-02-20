@@ -1,0 +1,20 @@
+apiVersion: agent.open-cluster-management.io/v1
+kind: KlusterletAddonConfig
+metadata:
+  name: 'hycl1'
+  namespace: 'hycl1'
+spec:
+  clusterName: 'hycl1'
+  clusterNamespace: 'hycl1'
+  clusterLabels:
+    cloud: ai-hypershift
+  applicationManager:
+    enabled: true
+  policyController:
+    enabled: true
+  searchCollector:
+    enabled: true
+  certPolicyController:
+    enabled: true
+  iamPolicyController:
+    enabled: true
