@@ -99,4 +99,50 @@
    
 [![Worker nodes](https://github.com/fdavalo/hypershift-agent-mode/blob/main/hypershift-cluster-nodes.png?raw=true)](hypershift-cluster-nodes.png)
 
+ ## CRD examples
  
+                     apiVersion: hypershift.openshift.io/v1alpha1
+                     kind: HostedCluster
+                     metadata:
+                       name: 'hycl1'
+                       namespace: 'hycl1'
+                       labels:
+                     spec:
+                       release:
+                         image: quay.io/openshift-release-dev/ocp-release:4.11.27-x86_64
+                       pullSecret:
+                         name: cluster-hycl1-pullsecret
+                       sshKey:
+                         name: cluster-hycl1-sshkey
+                       networking:
+                         podCIDR: 10.132.0.0/14
+                         serviceCIDR: 172.31.0.0/16
+                         machineCIDR: 10.6.82.0/24
+                       platform:
+                         type: Agent
+                         agent:
+                           agentNamespace: 'baremetal'
+                       infraID: 'hycl1'
+                       dns:
+                         baseDomain: 'redhat.hpecic.net'
+                       services:
+                       - service: APIServer
+                         servicePublishingStrategy:
+                           type: NodePort
+                           nodePort:
+                             address: 10.6.82.55
+                             port: 0
+                       - service: OAuthServer
+                         servicePublishingStrategy:
+                           type: Route
+                       - service: OIDC
+                         servicePublishingStrategy:
+                           type: Route
+                       - service: Konnectivity
+                         servicePublishingStrategy:
+                           type: Route
+                       - service: Ignition
+                         servicePublishingStrategy:
+                           type: Route
+
+
