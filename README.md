@@ -146,3 +146,21 @@
                            type: Route
 
 
+                     apiVersion: hypershift.openshift.io/v1alpha1
+                     kind: NodePool
+                     metadata:
+                       name: 'nodepool-hycl1-1'
+                       namespace: 'hycl1'
+                     spec:
+                       clusterName: 'hycl1'
+                       replicas: 2
+                       management:
+                         autoRepair: false
+                         upgradeType: InPlace
+                       platform:
+                         type: Agent
+                         agent:
+                           agentLabelSelector:
+                             matchLabels: {}
+                       release:
+                         image: quay.io/openshift-release-dev/ocp-release:4.11.27-x86_64
